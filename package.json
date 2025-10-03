@@ -1,0 +1,50 @@
+{
+  "name": "insure-chat",
+  "description": "A chatbot for insurance claims and FAQs",
+  "tagline": "Insurance help, made conversational.",
+  "version": "0.0.1",
+  "author": {
+    "name": "Pranav Verma",
+    "email": "pranav12340987@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pranav89624/InsureChat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pranav89624/InsureChat/issues"
+  },
+  "keywords": [
+    "insurechat",
+    "insurance",
+    "chatbot",
+    "nextjs",
+    "ai-assistant",
+    "rag"
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed": "tsx scripts/seed.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^1.22.0",
+    "dotenv": "^17.2.3",
+    "lucide-react": "^0.446.0",
+    "mongoose": "^8.19.0",
+    "next": "15.5.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.20.6",
+    "typescript": "^5.6.0"
+  }
+}
