@@ -1,0 +1,16 @@
+{
+  "name": "InsureChat",
+  "short_name": "InsureChat",
+  "description": "Insurance help, made conversational.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1522",
+  "theme_color": "#0b1522",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
