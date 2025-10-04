@@ -105,7 +105,7 @@ export default function Home() {
   }, [inputValue]);
 
   return (
-    <div className="relative isolate min-h-screen overflow-hidden pb-12">
+    <div className="relative isolate overflow-hidden">
       <div
         className="pointer-events-none absolute inset-0 bg-grid-fade bg-grid-spacing opacity-20 sm:opacity-30 lg:opacity-40 mix-blend-soft-light"
         aria-hidden="true"
@@ -114,7 +114,7 @@ export default function Home() {
       <main className="relative z-10 mx-auto flex w-full flex-1 flex-col gap-6 px-4 pt-10 sm:gap-8 sm:px-6 lg:px-8">
         <section className="flex flex-1 flex-col gap-6 sm:gap-8">
           <div className="relative mx-auto w-full flex-1">
-            <div className="relative flex md:min-h-[80vh] w-full flex-col">
+            <div className="relative flex min-h-[80dvh] w-full flex-col">
               <div className="relative flex-1">
                 <div className="relative px-4 sm:px-8">
                   <div className="flex-1 space-y-2">
@@ -132,7 +132,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="relative px-4 pt-3 sm:px-8 max-w-4xl mx-auto w-full">
+              <div className="px-4 pt-3 sm:px-8 max-w-4xl mx-auto w-full">
                 <div className="flex items-end gap-2 sm:items-center sm:gap-3">
                   <div className="relative w-full">
                     <span className="pointer-events-none absolute inset-y-0 left-4 hidden items-center text-emerald-200/80 sm:flex">
@@ -144,7 +144,7 @@ export default function Home() {
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      placeholder="Ask about claims, coverage, or next steps..."
+                      placeholder="Ask regarding your insurance..."
                       className="max-h-25 w-full resize-none rounded-3xl bg-white/[0.08] px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400/80 transition focus:outline-none focus:ring-2 focus:ring-emerald-400/50 sm:pl-12"
                       disabled={isLoading}
                       aria-label="Message InsureChat"

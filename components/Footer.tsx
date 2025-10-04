@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="relative mt-auto">
+    <footer className="relative">
       <div className="pointer-events-none absolute inset-0" />
       <div className="relative mx-auto max-w-7xl px-4 py-6">
         <div className="flex flex-col items-center justify-between gap-4 text-sm text-slate-300 sm:flex-row">

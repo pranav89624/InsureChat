@@ -77,9 +77,9 @@ export default function RootLayout({
       <body
         className={`${plusJakarta.variable} font-sans antialiased bg-night-950 text-slate-100`}
       >
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col">
           <Header />
-          <div className="flex-1">{children}</div>
+          <div>{children}</div>
           <Footer />
         </div>
       </body>
