@@ -11,6 +11,7 @@ interface Message {
   text: string;
   isBot: boolean;
   timestamp: Date;
+  role: "user" | "assistant";
 }
 
 export default function Home() {
@@ -20,6 +21,7 @@ export default function Home() {
   text: "Hello! 👋 I'm InsureChat. Insurance help, made conversational.\n\n• Check claim status updates in plain language\n• Decode coverage details in seconds\n• Plan confident next steps for any policy question\n\nAsk me anything insurance-related and I'll take it from here.",
       isBot: true,
       timestamp: new Date(),
+      role: "assistant",
     },
   ]);
   const [inputValue, setInputValue] = useState("");
@@ -46,6 +48,7 @@ export default function Home() {
       text: trimmed,
       isBot: false,
       timestamp: new Date(),
+      role: "user",
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -53,12 +56,23 @@ export default function Home() {
     setIsLoading(true);
 
     try {
+      const conversationHistory = messages
+        .filter((msg) => msg.id !== "1")
+        .map((msg) => ({
+          role: msg.role,
+          content: msg.text,
+          timestamp: msg.timestamp,
+        }));
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: trimmed }),
+        body: JSON.stringify({
+          message: trimmed,
+          history: conversationHistory,
+        }),
       });
 
       if (!response.ok) {
@@ -71,9 +85,10 @@ export default function Home() {
         id: (Date.now() + 1).toString(),
         text:
           data.reply?.trim() ||
-          "I’m here and ready to help with insurance-specific questions any time you need me.",
+          "I'm here and ready to help with insurance-specific questions any time you need me.",
         isBot: true,
         timestamp: new Date(),
+        role: "assistant",
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -83,6 +98,7 @@ export default function Home() {
         text: "Service is temporarily unavailable. Please try again shortly.",
         isBot: true,
         timestamp: new Date(),
+        role: "assistant",
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {

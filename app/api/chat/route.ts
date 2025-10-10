@@ -2,13 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import FAQ from "@/models/FAQ";
 import Claim from "@/models/Claim";
-import { generateEmbedding, generateText } from "@/lib/gemini";
+import {
+  generateEmbedding,
+  generateText,
+  generateChatResponse,
+} from "@/lib/gemini";
 import { findTopKSimilar, hasRelevantResults } from "@/lib/vectorSearch";
+import {
+  shouldIncludeHistory,
+  getRelevantHistory,
+  formatHistoryForAPI,
+} from "@/lib/contextDetection";
+
+interface HistoryMessage {
+  role: "user" | "assistant";
+  content: string;
+  timestamp?: Date;
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { message } = body;
+    const { message, history } = body;
 
     if (!message || typeof message !== "string") {
       return NextResponse.json(
@@ -16,6 +31,10 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const messageHistory: HistoryMessage[] = Array.isArray(history)
+      ? history
+      : [];
 
     await connectDB();
 
@@ -240,13 +259,41 @@ export async function POST(request: NextRequest) {
           : "";
 
       try {
-        const aiPrompt = `You are a helpful insurance assistant. Answer this insurance-related question in a friendly, professional way. If you're not completely certain, acknowledge the limitation and suggest contacting support for specific details.\n\nQuestion: ${message}\n\n${
-          lowConfidenceContext
-            ? `Here are some related FAQs for context:\n${lowConfidenceContext}`
-            : ""
-        }`;
+        const needsHistory = shouldIncludeHistory(message, messageHistory);
 
-        let aiReply = await generateText(aiPrompt, "");
+        let aiReply: string;
+
+        if (needsHistory && messageHistory.length > 0) {
+          const relevantHistory = getRelevantHistory(messageHistory, 5);
+          const formattedHistory = formatHistoryForAPI(relevantHistory);
+
+          const systemMessage = {
+            role: "system" as const,
+            content:
+              "You are a helpful insurance assistant. Answer questions in a friendly, professional way. " +
+              (lowConfidenceContext
+                ? `Here are some related FAQs for reference:\n${lowConfidenceContext}\n\n`
+                : "") +
+              "If you're not completely certain, acknowledge the limitation and suggest contacting support for specific details.",
+          };
+
+          const messages = [
+            systemMessage,
+            ...formattedHistory,
+            { role: "user" as const, content: message },
+          ];
+
+          aiReply = await generateChatResponse(messages);
+        } else {
+          const aiPrompt = `You are a helpful insurance assistant. Answer this insurance-related question in a friendly, professional way. If you're not completely certain, acknowledge the limitation and suggest contacting support for specific details.\n\nQuestion: ${message}\n\n${
+            lowConfidenceContext
+              ? `Here are some related FAQs for context:\n${lowConfidenceContext}`
+              : ""
+          }`;
+
+          aiReply = await generateText(aiPrompt, "");
+        }
+
         aiReply = aiReply
           .replace(/\*\*/g, "")
           .replace(/\*/g, "")
@@ -261,8 +308,8 @@ export async function POST(request: NextRequest) {
         console.error("Error generating AI response:", error);
         const fallbackReply =
           "I don't have specific information about that in my knowledge base right now. Please contact our customer support team for detailed assistance:\n\n" +
-          "Phone: 1-800-INSURANCE\n" +
-          "Email: support@insuranceclaimassistant.com\n" +
+          "Phone: 1-800-INSURECHAT\n" +
+          "Email: support@insurechat.com\n" +
           "Hours: Monday-Friday, 8 AM - 8 PM EST";
 
         return NextResponse.json({ reply: fallbackReply });
@@ -281,7 +328,28 @@ export async function POST(request: NextRequest) {
 
     let reply: string;
     try {
-      reply = await generateText(message, context);
+      const needsHistory = shouldIncludeHistory(message, messageHistory);
+
+      if (needsHistory && messageHistory.length > 0) {
+        const relevantHistory = getRelevantHistory(messageHistory, 5);
+        const formattedHistory = formatHistoryForAPI(relevantHistory);
+
+        const systemMessage = {
+          role: "system" as const,
+          content: `You are a helpful insurance assistant. Use the following FAQ knowledge to answer questions:\n\n${context}\n\nAnswer in a friendly, professional way based on this knowledge and the conversation history.`,
+        };
+
+        const messages = [
+          systemMessage,
+          ...formattedHistory,
+          { role: "user" as const, content: message },
+        ];
+
+        reply = await generateChatResponse(messages);
+      } else {
+        reply = await generateText(message, context);
+      }
+
       reply = reply.replace(/\*\*/g, "").replace(/\*/g, "").replace(/_/g, "");
     } catch (error) {
       console.error("Error generating response:", error);

@@ -56,15 +56,30 @@ export async function generateChatResponse(
   messages: Array<{ role: string; content: string }>
 ): Promise<string> {
   try {
-    const conversationPrompt = messages
-      .map(
-        (msg) => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`
-      )
-      .join("\n\n");
+    // Build a properly formatted conversation prompt
+    // Separate system message if present
+    const systemMsg = messages.find((msg) => msg.role === "system");
+    const conversationMsgs = messages.filter((msg) => msg.role !== "system");
+
+    let fullPrompt = "";
+
+    // Add system context at the beginning
+    if (systemMsg) {
+      fullPrompt += `${systemMsg.content}\n\n---\n\nConversation:\n\n`;
+    }
+
+    // Add conversation history
+    conversationMsgs.forEach((msg) => {
+      const speaker = msg.role === "user" ? "User" : "Assistant";
+      fullPrompt += `${speaker}: ${msg.content}\n\n`;
+    });
+
+    // Add instruction for the assistant to respond
+    fullPrompt += "Assistant:";
 
     const result = await genAI.models.generateContent({
       model: "gemini-2.0-flash-exp",
-      contents: conversationPrompt,
+      contents: fullPrompt,
     });
 
     if (!result.text) {
