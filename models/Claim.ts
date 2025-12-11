@@ -1,7 +1,6 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IClaim extends Document {
-  _id: string;
   claimId: string;
   customerName: string;
   policyNumber: string;
