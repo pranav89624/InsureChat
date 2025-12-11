@@ -182,7 +182,7 @@ Visit <http://localhost:3000> and start chatting.
 ## Troubleshooting
 
 - **MongoDB auth errors:** Ensure `MONGODB_URI` includes credentials and that your IP allowlist covers the hosting environment.
-- **Gemini quota or auth issues:** Re-check the API key in Google AI Studio and confirm it has access to the `text-embedding-004` model.
+- **Gemini quota or auth issues:** Re-check the API key in Google AI Studio and confirm it has access to the `gemini-embedding-001` model.
 - **Seed script fails:** Both env vars must be set; the Mongo connection string should name the database (e.g. `mongodb+srv://.../insurechat`).
 
 ## License
